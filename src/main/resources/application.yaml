@@ -1,0 +1,7 @@
+ru:
+  am:
+    config:
+      telegram:
+        auth-file-path:
+          unix: '/etc/am/am_info_bot_creds.json'
+          win: 'TODO'
