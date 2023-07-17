@@ -62,7 +62,6 @@ class AmInfoTgBot(
                     .then(Mono.empty())
             }
             .flatMap { operateOnState(update, it) }
-
             .subscribe()
     }
 
@@ -79,7 +78,6 @@ class AmInfoTgBot(
                     sendMsg("Регистрация успешна!", update.message.chatId.toString())
                 }
             }
-
             else -> operateOnAction(update, user)
         }
     }
@@ -88,8 +86,10 @@ class AmInfoTgBot(
         if (update.message.text == "/send_schedule" && user.roles.contains(AmRole.SCHEDULE_MANAGER) && user.currentState == ChatState.NONE) {
             return amUserRepository.save(
                 user.apply { currentState = ChatState.WAIT_FOR_SCHEDULE_DOC }
-            )
-        } else if (user.roles.contains(AmRole.SCHEDULE_MANAGER) && user.currentState == ChatState.NONE && update.message.hasDocument()) {
+            ).doOnSuccess {
+                sendMsg("Ожидание загрузки таблицы", update.message.chatId.toString())
+            }
+        } else if (user.roles.contains(AmRole.SCHEDULE_MANAGER) && user.currentState == ChatState.WAIT_FOR_SCHEDULE_DOC && update.message.hasDocument()) {
             val docId = update.message.document.fileId
             val docName = update.message.document.fileName
             val getID = java.lang.String.valueOf(update.message.from.id)
@@ -98,6 +98,10 @@ class AmInfoTgBot(
             val outp = java.io.File("./data/userDoc/${getID}_$docName")
             downloadFile(file, outp)
             //todo send file to schedule-app
+            return amUserRepository.save(user.apply { currentState = ChatState.NONE }).doOnSuccess {
+                sendMsg("Таблица принята", update.message.chatId.toString())
+                sendMenuForRole(update, user)
+            }
         } else sendMenuForRole(update, user)
         return Mono.just(user)
     }
