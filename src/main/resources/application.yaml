@@ -5,3 +5,13 @@ ru:
         auth-file-path:
           unix: '/etc/am/am_info_bot_creds.json'
           win: 'TODO'
+
+spring:
+  data:
+    mongodb:
+      authentication-database: admin
+      password: pass123
+      username: mongofiboadmin
+      host: localhost
+      port: 27017
+      database: info-bot
