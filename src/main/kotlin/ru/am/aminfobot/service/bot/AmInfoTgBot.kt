@@ -2,7 +2,14 @@ package ru.am.aminfobot.service.bot
 
 import jakarta.annotation.PostConstruct
 import mu.KotlinLogging
+import org.springframework.core.io.FileSystemResource
+import org.springframework.http.HttpEntity
+import org.springframework.http.MediaType
+import org.springframework.http.client.MultipartBodyBuilder
 import org.springframework.stereotype.Component
+import org.springframework.util.MultiValueMap
+import org.springframework.web.reactive.function.BodyInserters
+import org.springframework.web.reactive.function.client.WebClient
 import org.telegram.telegrambots.bots.TelegramLongPollingBot
 import org.telegram.telegrambots.meta.TelegramBotsApi
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod
@@ -23,7 +30,8 @@ import ru.am.aminfobot.service.file.ConfigLoaderService
 @Component
 class AmInfoTgBot(
     private val configLoaderService: ConfigLoaderService,
-    private val amUserRepository: AmUserRepository
+    private val amUserRepository: AmUserRepository,
+    private val schedWebClient: WebClient
 ) : TelegramLongPollingBot(configLoaderService.loadTgProps().token) {
 
     private val log = KotlinLogging.logger { }
@@ -40,6 +48,7 @@ class AmInfoTgBot(
     }
 
     override fun onUpdateReceived(update: Update) {
+
         log.info("new msg received: $update")
         if (update.message?.text == "/start") sendMsg("chatId: ${update.message.chatId}", update.message.chatId.toString())
         process(update)
@@ -78,6 +87,7 @@ class AmInfoTgBot(
                     sendMsg("Регистрация успешна!", update.message.chatId.toString())
                 }
             }
+
             else -> operateOnAction(update, user)
         }
     }
@@ -97,13 +107,30 @@ class AmInfoTgBot(
             val file: File = execute<File, BotApiMethod<File>>(getFile)
             val outp = java.io.File("./data/userDoc/${getID}_$docName")
             downloadFile(file, outp)
-            //todo send file to schedule-app
-            return amUserRepository.save(user.apply { currentState = ChatState.NONE }).doOnSuccess {
-                sendMsg("Таблица принята", update.message.chatId.toString())
-                sendMenuForRole(update, user)
-            }
+            log.info { "отправка файлика" }
+            return Mono.defer {
+                schedWebClient.post()
+                    .uri("http://localhost:8081")
+                    .contentType(MediaType.MULTIPART_FORM_DATA)
+                    .body(BodyInserters.fromMultipartData(fromFile(outp)))
+                    .retrieve()
+                    .bodyToMono(String::class.java)
+            }.then(
+                amUserRepository.save(user.apply { currentState = ChatState.NONE }).doOnSuccess {
+                    sendMsg("Таблица принята", update.message.chatId.toString())
+                    sendMenuForRole(update, user)
+                }
+            )
+                .doOnError { log.error("some err -> ${it.message}", it) }
+                .subscribeOn(Schedulers.boundedElastic())
         } else sendMenuForRole(update, user)
         return Mono.just(user)
+    }
+
+    private fun fromFile(file: java.io.File): MultiValueMap<String?, HttpEntity<*>?> {
+        val builder = MultipartBodyBuilder()
+        builder.part("file", FileSystemResource(file))
+        return builder.build()
     }
 
     private fun sendMenuForRole(update: Update, user: AmUser) {
