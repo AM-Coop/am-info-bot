@@ -1,4 +1,4 @@
-package ru.am.aminfobot.model.enums
+package ru.am.aminfobot.model.entity
 
 enum class AmRole {
     GUEST,

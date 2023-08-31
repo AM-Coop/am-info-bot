@@ -1,17 +1,26 @@
 ru:
   am:
     config:
+      schedule-back:
+        url: 'http://localhost:8087'
       telegram:
         auth-file-path:
           unix: '/etc/am/am_info_bot_creds.json'
           win: 'TODO'
 
 spring:
-  data:
-    mongodb:
-      authentication-database: admin
-      password: pass123
-      username: mongofiboadmin
-      host: localhost
-      port: 27017
-      database: info-bot
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    password: 'password'
+    username: 'postgres'
+    url: 'jdbc:postgresql://localhost:5432/bot'
+  jpa:
+
+    hibernate:
+
+      ddl-auto: update
+    show-sql: false
+    generate-ddl: true
+
+server:
+  port: 8085

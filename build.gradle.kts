@@ -16,10 +16,14 @@ repositories {
 }
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-data-mongodb-reactive")
-    implementation("org.springframework.boot:spring-boot-starter-webflux")
+    // implementation("org.springframework.boot:spring-boot-starter-data-mongodb-reactive")
+    implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.telegram:telegrambots:6.5.0")
     implementation("io.github.microutils:kotlin-logging:3.0.5")
+
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("io.projectreactor:reactor-core")
+    implementation("org.postgresql:postgresql")
 
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")

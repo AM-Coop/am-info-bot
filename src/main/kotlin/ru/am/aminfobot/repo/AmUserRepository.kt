@@ -1,12 +1,12 @@
 package ru.am.aminfobot.repo
 
-import org.springframework.data.mongodb.repository.ReactiveMongoRepository
+import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
-import reactor.core.publisher.Mono
-import ru.am.aminfobot.repo.document.AmUser
+import ru.am.aminfobot.model.entity.AmUser
+import java.util.UUID
 
 @Repository
-interface AmUserRepository : ReactiveMongoRepository<AmUser, Long> {
+interface AmUserRepository : CrudRepository<AmUser, UUID> {
 
-    fun findByUserId(userId: Long): Mono<AmUser>
+    fun findByUserId(userId: Long): AmUser?
 }
