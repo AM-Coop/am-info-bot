@@ -43,10 +43,9 @@ class AmInfoTgBot(
     }
 
     override fun onUpdateReceived(update: Update) {
-
         log.info("new msg received: $update")
         if (update.message?.text == "/start") sendMsg("chatId: ${update.message.chatId}", update.message.chatId.toString())
-        process(update)
+        else process(update)
     }
 
     private fun process(update: Update) {
@@ -86,50 +85,6 @@ class AmInfoTgBot(
     }
 
     private fun operateOnAction(update: Update, user: AmUser): AmUser {
-        // if (update.message.text == "/send_schedule" && user.roles.contains(AmRole.SCHEDULE_MANAGER) && user.currentState == ChatState.NONE) {
-        //     return amUserRepository.save(
-        //         user.apply { currentState = ChatState.WAIT_FOR_SCHEDULE_DOC }
-        //     ).doOnSuccess {
-        //         sendMsg("Ожидание загрузки таблицы", update.message.chatId.toString())
-        //     }
-        // } else if (user.roles.contains(AmRole.SCHEDULE_MANAGER) && user.currentState == ChatState.WAIT_FOR_SCHEDULE_DOC && update.message.hasDocument()) {
-        //     val docId = update.message.document.fileId
-        //     val docName = update.message.document.fileName
-        //     val getID = java.lang.String.valueOf(update.message.from.id)
-        //     val getFile = GetFile(docId)
-        //     val file: File = execute<File, BotApiMethod<File>>(getFile)
-        //     val outp = java.io.File("/tmp/wb/${getID}_$docName")
-        //     downloadFile(file, outp)
-        //
-        //     log.info { "отправка файлика" }
-        //     return Mono.defer {
-        //         schedWebClient.get()
-        //             .uri("http://localhost:8081/v2/refresh")
-        //             // .contentType(MediaType.MULTIPART_FORM_DATA)
-        //             // .body(BodyInserters.fromMultipartData(fromFile(outp)))
-        //             .retrieve()
-        //             .bodyToMono(String::class.java)
-        //     }.then(
-        //         amUserRepository.save(user.apply { currentState = ChatState.NONE }).doOnSuccess {
-        //             sendMsg("Таблица принята", update.message.chatId.toString())
-        //             sendMenuForRole(update, user)
-        //         }
-        //             .doOnError { log.error("some err -> ${it.message}", it) }
-        //             .subscribeOn(Schedulers.boundedElastic())
-        //     )
-        //
-        // } else if (update.message.text == "/result") {
-        //     val res = java.io.File("/tmp/wb")
-        //
-        //     res.listFiles()?.firstOrNull { it.name.endsWith(".txt") }?.let {
-        //
-        //         FileInputStream(it).use { fis -> sendMsg(String(fis.readAllBytes()), update.message.chatId.toString()) }
-        //         sendMenuForRole(update, user)
-        //     }
-        //
-        // } else sendMenuForRole(update, user)
-        // return Mono.just(user)
-        //
         if (update.message.text == "/refresh" && AmRole.valueOf(user.userRole) in listOf(AmRole.SCHEDULE_MANAGER, AmRole.ADMIN)) {
             val restTemplate = RestTemplate()
             val fooResourceUrl = "$scheduleBackUrl/v2/refresh"

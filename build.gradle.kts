@@ -20,6 +20,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.telegram:telegrambots:6.5.0")
     implementation("io.github.microutils:kotlin-logging:3.0.5")
+// https://mvnrepository.com/artifact/org.openapitools/openapi-generator
+    implementation("org.openapitools:openapi-generator:5.4.0")
 
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("io.projectreactor:reactor-core")
