@@ -1,7 +1,6 @@
 package ru.am.aminfobot.service.bot
 
 import jakarta.annotation.PostConstruct
-import mu.KotlinLogging
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.io.FileSystemResource
 import org.springframework.http.HttpEntity
@@ -26,7 +25,7 @@ class AmInfoTgBot(
     private val amUserRepository: AmUserRepository,
 ) : TelegramLongPollingBot(configLoaderService.loadTgProps().token) {
 
-    private val log = KotlinLogging.logger { }
+    // private val log = LogFactory.getLog(this::class.java)
 
     @Value("\${ru.am.config.schedule-back.url}")
     private lateinit var scheduleBackUrl: String
@@ -43,7 +42,7 @@ class AmInfoTgBot(
     }
 
     override fun onUpdateReceived(update: Update) {
-        log.info("new msg received: $update")
+        println("new msg received: $update")
         if (update.message?.text == "/start") sendMsg("chatId: ${update.message.chatId}", update.message.chatId.toString())
         else process(update)
     }
@@ -51,7 +50,7 @@ class AmInfoTgBot(
     private fun process(update: Update) {
         var user = amUserRepository.findByUserId(update.message.from.id)
         if (user == null) {
-            log.info { "новый юзер" }
+            // log.info { "новый юзер" }
             sendMsg("Напиши свое духовное имя для регистрации", update.message.chatId.toString())
             user = amUserRepository.save(
                 AmUser().apply {
@@ -72,7 +71,7 @@ class AmInfoTgBot(
                     user.apply {
                         spiritualName = update.message.text
                         currentState = ChatState.NONE
-                    }.also { log.info { "spiritualName [${update.message.text}] was updated for ${user.username}" } }
+                    }.also { println("spiritualName [${update.message.text}] was updated for ${user.username}") }
                 ).also {
                     sendMsg("Регистрация успешна!", update.message.chatId.toString())
                     sendMenuForRole(update, user)
@@ -91,7 +90,7 @@ class AmInfoTgBot(
             val res = try {
                 restTemplate.getForEntity("$fooResourceUrl", String::class.java).body ?: ""
             } catch (err: Exception) {
-                log.error("err -> ${err.message}", err)
+                err.printStackTrace()
                 err.message ?: ""
             }
             sendMsg(res, update.message.chatId.toString())
