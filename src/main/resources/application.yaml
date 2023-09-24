@@ -7,6 +7,10 @@ ru:
         auth-file-path:
           unix: '/etc/am/am_info_bot_creds.json'
           win: 'TODO'
+#javax:
+#  persistence:
+#    jdbc:
+#      url: jdbc:mysql://localhost/jpaForBeginners
 
 spring:
   datasource:
@@ -15,6 +19,7 @@ spring:
     username: 'postgres'
     url: 'jdbc:postgresql://localhost:5432/bot'
   jpa:
+    database-platform: org.hibernate.dialect.PostgreSQL10Dialect
 
 
     hibernate:
