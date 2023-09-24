@@ -16,6 +16,7 @@ spring:
     url: 'jdbc:postgresql://localhost:5432/bot'
   jpa:
 
+
     hibernate:
 
       ddl-auto: update
