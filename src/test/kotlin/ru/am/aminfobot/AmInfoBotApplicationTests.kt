@@ -26,4 +26,8 @@ class AmInfoBotApplicationTests {
             partnerAppRepository.findAll().first()
         )
     }
+
+    private fun existsByChatId(): Boolean {
+        return partnerAppRepository.findByChatId("")?.let { true } ?: false
+    }
 }
