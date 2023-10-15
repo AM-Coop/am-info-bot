@@ -28,6 +28,6 @@ class AmInfoBotApplicationTests {
     }
 
     private fun existsByChatId(): Boolean {
-        return partnerAppRepository.findByChatId("")?.let { true } ?: false
+        return partnerAppRepository.findByChatId(0)?.let { true } ?: false
     }
 }

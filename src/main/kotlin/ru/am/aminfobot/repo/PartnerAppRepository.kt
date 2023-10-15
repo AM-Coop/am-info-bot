@@ -5,5 +5,5 @@ import ru.am.aminfobot.model.entity.PartnerApp
 import java.util.UUID
 
 interface PartnerAppRepository : CrudRepository<PartnerApp, UUID> {
-    fun findByChatId(chatId: String): PartnerApp?
+    fun findByChatId(chatId: Long): PartnerApp?
 }
