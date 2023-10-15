@@ -13,20 +13,34 @@ ru:
 #      url: jdbc:mysql://localhost/jpaForBeginners
 
 spring:
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
   datasource:
     driver-class-name: org.postgresql.Driver
     password: 'password'
     username: 'postgres'
-    url: 'jdbc:postgresql://localhost:5432/bot'
+    url: 'jdbc:postgresql://localhost:5432/crm'
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQL10Dialect
 
 
+
     hibernate:
 
-      ddl-auto: update
+    #      ddl-auto: update
     show-sql: false
-    generate-ddl: true
+#    generate-ddl: true
+
+
+
+rsa:
+  private-key: 'classpath:certs/private_key.pem'
+  public-key: 'classpath:certs/public_key.pem'
 
 server:
-  port: 8085
+  port: 450
+  ssl:
+    key-store: 'classpath:keystore/keystore.p12'
+    key-store-password: cb92b467-1d2a-403d-9a4f-c34e1575eb83
+    keyStoreType: PKCS12
+    keyAlias: am
